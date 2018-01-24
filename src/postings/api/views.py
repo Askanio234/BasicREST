@@ -5,6 +5,7 @@ from postings.models import BlogPost
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrReadOnly
 
+
 class BlogPostCreateView(mixins.CreateModelMixin, generics.ListAPIView):
     lookup_field = 'pk'
     serializer_class = BlogPostSerializer
@@ -23,11 +24,17 @@ class BlogPostCreateView(mixins.CreateModelMixin, generics.ListAPIView):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
+    def get_serializer_context(self, *args, **kwargs):
+        return {"request": self.request}
+
 
 class BlogPostRUDView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
     serializer_class = BlogPostSerializer
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get_queryset(self):
         return BlogPost.objects.all()
+
+    def get_serializer_context(self, *args, **kwargs):
+        return {"request": self.request}
